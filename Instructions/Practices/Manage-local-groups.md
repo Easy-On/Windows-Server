@@ -4,7 +4,7 @@
 
 * VN1-SRV1
 * VN1-SRV4
-* VN1-SRV5
+* VN1-SRV10
 * CL1
 * CL2
 
@@ -17,7 +17,7 @@ If you skipped the lab [Explore Windows Admin Center](../Labs/Explore-Windows-Ad
 
 ## Task
 
-On CL1, CL2, and VN1-SRV5, add LocalAdmin to the Administrators group. Use a different tool on each machine.
+On CL1, CL2, and VN1-SRV10, add LocalAdmin to the Administrators group. Use a different tool on each machine.
 
 ## Instructions
 
