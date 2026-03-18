@@ -405,55 +405,12 @@ From **\\\VN2-SRV1\\C$\\Temp** open the report in a browser.
 
 ## Exercise 3: Create a stretched Hyper-V cluster
 
-1. [Install the failover clustering feature](#task-1-install-the-failover-clustering-feature) on VN2-SRV1 and VN3-SRV1
-1. [Add cluster nodes to group](#task-2-add-cluster-nodes-to-group) Witness Modify: VN2-SRV1 and VN3-SRV1
-1. [Create a failover cluster](#task-3-create-a-failover-cluster) with VN2-SRV1 and VN3-SRV1 as nodes and the IP addresses 10.1.2.9 and 10.3.9; use \\\\vn1-clst1-fs\\Witness as witness and set the resilience default period to 10; set the preffered site to the 10.1.2.0 subnet; add all available disks to the cluster
-1. [Add disk to cluster shared volume](#task-4-add-disk-to-cluster-shared-volumes): disk Data from VN2-SRV1
-1. [Configure storage replica](#task-5-configure-storage-replica) to replicate the Data volume from VN2-SRV1 to VN3-SRV1 using the Log volume as log disk
+1. [Add cluster nodes to group](#task-1-add-cluster-nodes-to-group) Witness Modify: VN2-SRV1 and VN3-SRV1
+1. [Create a failover cluster](#task-2-create-a-failover-cluster) with VN2-SRV1 and VN3-SRV1 as nodes and the IP addresses 10.1.2.9 and 10.3.9; use \\\\vn1-clst1-fs\\Witness as witness and set the resilience default period to 10; set the preffered site to the 10.1.2.0 subnet; add all available disks to the cluster
+1. [Add disk to cluster shared volume](#task-3-add-disk-to-cluster-shared-volumes): disk Data from VN2-SRV1
+1. [Configure storage replica](#task-4-configure-storage-replica) to replicate the Data volume from VN2-SRV1 to VN3-SRV1 using the Log volume as log disk
 
-### Task 1: Install the failover clustering feature
-
-#### Desktop Experience
-
-Perform this task on CL1.
-
-1. Open Server Manager.
-1. In Server Manager, in the menu, click **Manage**, **Add Roles and Features**.
-1. In the Add Rules and Features Wizard, on page **Before You Begin**, click **Next >**.
-1. On page Installation Type, ensure **Role-based or feature-based installation** is selected and click **Next >**.
-1. On page Server Selection, click **VN2-SRV1.ad.adatum.com** and click **Next >**.
-1. On page Server Roles, click **Next >**.
-1. On page Features, activate **Failover Clustering**.
-1. In Add features that are required for Failover Clustering, click **Add Features**.
-1. In **Add Roles and Features Wizard**, on page **Features**, click **Next >**.
-1. On page Confirmation, verify your selection and click **Install**.
-1. On  page **Results**, do not wait for the installation to succeed. Click **Close**.
-
-Repeat the steps of this task to install the role on **VN3-SRV1**.
-
-Do not wait for the installation to succeed. Continue with the next task.
-
-#### PowerShell
-
-Perform this task on CL1.
-
-1. Open **Terminal**.
-1. Install **Failover Clustering** on **VN2-SRV1** and **VN3-SRV1**
-
-    ````powershell
-    Invoke-Command `
-      -ComputerName VN2-SRV1, VN3-SRV1 `
-      -ScriptBlock {
-        Install-WindowsFeature `
-            -Name Failover-Clustering `
-            -IncludeManagementTools `
-            -Restart
-    }
-    ````
-
-Do not wait for the installation to succeed. Continue with the next task.
-
-### Task 2: Add cluster nodes to group
+### Task 1: Add cluster nodes to group
 
 Perform this task on CL1.
 
@@ -468,7 +425,7 @@ Perform this task on CL1.
 1. In **Select Users, Contacts, Computers, Services Accounts, or Groups**, under **Enter the object names to select**, type **VN2-SRV1; VN3-SRV1** and click **OK**.
 1. In **Witness VN1-CLST Modify**, click **OK**.
 
-### Task 3: Create a failover cluster
+### Task 2: Create a failover cluster
 
 <!-- #### Windows Admin Center
 
@@ -603,7 +560,7 @@ Perform this task on VN2-SRV1.
    Set-ADComputer $clusterName -PrincipalsAllowedToDelegateToAccount $gw 
    ````
  -->
-### Task 4: Add disk to cluster shared volumes
+### Task 3: Add disk to cluster shared volumes
 
 Perform this task on CL1.
 
@@ -613,7 +570,7 @@ Perform this task on CL1.
 1. In Failover Cluster Manager, expand **VN2-VN3-CLST1.ad.adatum.com**, **Storage**, and click **Disks**.
 1. Under Disks (4), in the context menu of the disk with **Capacity** of **20 GB** with a **Status** of **Online**, click **Add to Cluster Shared Volumes**.
 
-### Task 5: Configure storage replica
+### Task 4: Configure storage replica
 
 Perform this task on VN2-SRV1.
 
