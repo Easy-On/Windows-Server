@@ -9,39 +9,23 @@
 * VN1-SRV5
 * VN1-SRV10
 
-## Known Issues
-
-As of December 2024, Microsoft release Windows Admin Center V2 without any documentation on how to set up Windows Admin Center on a cluster. Therefore, exercise 4 should be skipped. Repectively, in exercise 5 instructions and questions regarding Windows Admin Center should be ignored.
-
 ## Setup
-
-1. On **VN1-SRV2**, sign in as **ad\Administrator**.
-1. Open **Windows PowerShell** as Administrator.
-1. Execute these commands:
-
-    ````powershell
-    C:\LabResources\Solutions\New-CertTemplateWebServerExportable.ps1
-    C:\LabResources\Solutions\Set-CertTemplatePermissions.ps1 `
-        -Template WebServerExportable `
-        -ComputerName VN1-SRV4
-    ````
 
 1. On **CL1**, sign in as **ad\Administrator**.
 1. On **VN1-SRV4**, sign in as **ad\Administrator**.
 
 ## Introduction
 
-Adatum wants you to install a failover cluster to run an important virtual machine with high availability. Moreover, Adatum also wants to install the Windows Admin Center highly available. Lastly, prepare the new cluster to be used as a file share witness for other clusters.
+Adatum wants you to install a failover cluster to run an important virtual machine with high availability. You will also prepare the new cluster to be used as a file share witness for other clusters.
 
 ## Exercises
 
 1. [Configure the iSCSI initiator](#exercise-1-configure-the-iscsi-initiator)
 1. [Install and configure a failover cluster](#exercise-2-install-and-configure-a-failover-cluster)
 1. [Use Hyper-V on a cluster](#exercise-3-use-hyper-v-on-a-cluster)
-1. [Install Windows Admin Center on the cluster](#exercise-4-install-windows-admin-center-on-a-failover-cluster)
-1. [Install File Server on a failover cluster](#exercise-5-install-file-server-on-a-failover-cluster)
-1. [Test failover](#exercise-6-test-failover)
-1. [Use cluster-aware updating](#exercise-7-use-cluster-aware-updating)
+1. [Install File Server on a failover cluster](#exercise-4-install-file-server-on-a-failover-cluster)
+1. [Test failover](#exercise-5-test-failover)
+1. [Use cluster-aware updating](#exercise-6-use-cluster-aware-updating)
 
 ## Exercise 1: Configure the iSCSI initiator
 
@@ -200,22 +184,9 @@ Perform this task on CL1.
 1. [Validate the configuration](#task-3-validate-the-configuration) on VN1-SRV4 and VN1-SRV5
 1. [Create a failover cluster](#task-4-create-a-virtual-machine) with VN1-SRV4 and VN1-SRV5 as nodes with the name VN1-CLST1 and the IP address 10.1.1.33
 1. [Configure the quorum](#task-5-configure-the-quorum) to use the smallest disk as disk witness
-1. [Configure Cluster Shared Volumes](#task-6-configure-cluster-shared-volumes) according to the table below.
-
-    | Name | Capacity | Path |
-    |------|----------|------|
-    |      | 10,0 GB  |      |
-    |      | 80,0 GB  |      |
-
-1. [Configure cluster networks](#task-7-configure-cluster-networks) accoring to the table below
-
-    | Name | Subnets       | Enabled Options                                                                                            |
-    |------|---------------|------------------------------------------------------------------------------------------------------------|
-    |      | 10.1.1.0/24   | **Allow cluster network communication on this network**, **Allow clients to connect through this network** |
-    |      | 10.1.128.0/24 | **Do not allow cluster network communication on this network**                                             |
-    |      | 10.1.144.0/24 | **Do not allow cluster network communication on this network**                                             |
-    |      | 10.1.160.0/24 | **Allow cluster network communication on this network**                                                    |
-
+1. [Configure Cluster Shared Volumes](#task-6-configure-cluster-shared-volumes) 
+1. [Configure cluster networks](#task-7-configure-cluster-networks)
+   
 ### Task 1: Install the Remote Server Administration Failover Clustering Tools
 
 #### Desktop experience
@@ -325,7 +296,7 @@ Perform this task on CL1.
 1. On page Select Quorum Configuration Option, click **Advanced quorum configuration** and click **Next >**.
 1. On page Select Voting Configuration, ensure **All Nodes** is selected and click **Next >**.
 1. On page Select Quorum Witness, click **Configure a disk witness** and click **Next >**.
-1. On page Configure Storage Witness, expand the disks, find the disk **D** with the capacity of around 1000 MB. Activate the checkbox beside this disk and ensure, the other checkboxes are deactivated. Click **Next >**.
+1. On page Configure Storage Witness, expand the disks, find the disk with the capacity of around 1000 MB. Activate the checkbox beside this disk and ensure, the other checkboxes are deactivated. Click **Next >**.
 1. On page Confirmation, click **Next >**.
 1. On page Summary, click **Finish**.
 
@@ -369,6 +340,13 @@ Perform this task on CL1.
 
 ### Task 6: Configure Cluster Shared Volumes
 
+Use the following table to configure disks accordingly:
+
+    | Name | Capacity | Path |
+    |------|----------|------|
+    |      | 10,0 GB  |      |
+    |      | 80,0 GB  |      |
+    
 #### Desktop experience
 
 Perform this task on CL1.
@@ -432,15 +410,23 @@ Perform this task on CL1.
     ````
 
 ### Task 7: Configure cluster networks
+Use the folloing table to configure cluster networks accordingly:
+
+    | Name    | Subnets       | Enabled Options                                                                                            |
+    |---------|---------------|------------------------------------------------------------------------------------------------------------|
+    | Client  | 10.1.1.0/24   | **Allow cluster network communication on this network**, **Allow clients to connect through this network** |
+    | iSCSI 1 | 10.1.128.0/24 | **Do not allow cluster network communication on this network**                                             |
+    | iSCSI 2 | 10.1.144.0/24 | **Do not allow cluster network communication on this network**                                             |
+    | Cluster | 10.1.160.0/24 | **Allow cluster network communication on this network**                                                    |
 
 Perform this task on CL1.
 
 1. Open **Failover Cluster Manager**.
 1. In Failover Cluster Manager, expand **VN1-CLST1.ad.adatum.com**, and click **Networks**.
 1. In the context-menu of each cluster network, click **Properties**.
-1. In Properties of each network click the options according to the table above. Take a note of the names while configuring the networks. You will need them in the next step.
+1. In Properties of each network click the options according to the "Enabled options" column from the table above and change the name according to the "Name" column. You will need the name in the next step.
 1. In **Failover Cluster Manager**, in the context-menu of **Networks**, click **Live Migration Settings**.
-1. In Live Migration Settings, deactivate the cluster networks corresponding to 10.1.128.0/24 and 10.1.144.0/24. Click the cluster network corresponding to the subnet 10.1.160.0/24 and click **Up** until it appears at the top of the list. Click **OK**.
+1. In Live Migration Settings, deactivate the cluster networks "iSCSI 1" and "iSCSI 2". Click the cluster network "Cluster" and click **Up** until it appears at the top of the list. Click **OK**.
 
 ## Exercise 3: Use Hyper-V on a cluster
 
@@ -626,154 +612,7 @@ Perform this task on CL1.
 
     > The Virtual Machine Connection to VN1-SRV23 will be dropped. However, you will be able to reconnect afert a few seconds.
 
-## Exercise 4: Install Windows Admin center on a failover cluster
-
-1. [Download the install script](#task-1-download-the-install-script) from <https://learn.microsoft.com/en-us/windows-server/manage/windows-admin-center/deploy/high-availability#prerequisites> and copy it to VN1-SRV4
-1. [Uninstall Windows Admin Center](#task-2-uninstall-windows-admin-center) from VN1-SRV4
-1. [Request and export a certificate](#task-3-request-and-export-a-certificate) for Windows Admin Center on VN1-SRV4 using the WebServerExportable template
-1. [Install Windows Admin Center with high availability](#task-4-install-windows-admin-center-with-high-availability) on VN1-SRV4 with the IP address 10.1.1.34 and using the 10 GB volume
-1. [Verify Windows Admin Center installation](#task-5-verify-windows-admin-center-installation)
-
-    > Which roles were added to the failover cluster?
-
-    > Which resources are used by the failover cluster?
-
-    > How could you change the IP address of Windows Admin Center?
-
-    > Does Windows Admin Center work?
-
-### Task 1: Download the install script
-
-Perform this task on CL1.
-
-1. Open **Microsoft Edge**.
-1. In Microsoft Edge, navigate to <https://learn.microsoft.com/en-us/windows-server/manage/windows-admin-center/deploy/high-availability#prerequisites>.
-1. On page Deploy Windows Admin Center with high availability, under **Prerequisites**, click the link **Windows Admin Center HA Script zip file** (in the third bullet point).
-1. Extract the downloaded file to **\\\\vn1-srv4\\c$\\ClusterStorage\\Volumex**. Replace x with the number of the volume with 10 GB capacity, e.g. 1.
-
-### Task 2: Uninstall Windows Admin Center
-
-Perform this task on VN1-SRV4.
-
-1. In SConfig, enter **15**.
-1. Uninstall Windows Admin Center.
-
-    ````powershell
-    msiexec.exe /uninstall C:\LabResources\WindowsAdminCenter.msi /quiet
-    ````
-
-1. Remove the DNS A record admincenter.
-
-    ````powershell
-    Remove-DnsServerResourceRecord `
-        -ZoneName ad.adatum.com `
-        -RRType A `
-        -Name admincenter `
-        -ComputerName VN1-SRV1
-    ````
-
-### Task 3: Request and export a certificate
-
-Perform this task on VN1-SRV4.
-
-1. In SConfig, enter **15**.
-1. Request a certificate using the template **WebServerExportable** for **admincenter.ad.adatum.com**.
-
-    ````powershell
-    $hostname = 'admincenter'
-    $zoneName = 'ad.adatum.com'
-    $fQDN = "$hostname.$zoneName"
-    $enrollmentResult = Get-Certificate `
-        -Template WebServerExportable `
-        -SubjectName "CN=$fQDN" `
-        -DnsName $hostname, $fQDN `
-        -CertStoreLocation Cert:\LocalMachine\My\
-    ````
-
-1. Read a password for the PFX file.
-
-    ````powershell
-    $password = Read-Host -Prompt 'Password for PFX file' -AsSecureString
-    ````
-
-1. At the prompt Password for PFX file, enter a secure password and take a note.
-1. Export the certificate to a PFX file. Store the file on the CSV with 10 GB capacity.
-
-    ````powershell
-    # Replace x with the volume with 10 GB capacity, e.g., 1
-    $filePath = 'C:\ClusterStorage\Volumex\admincenter.ad.adatum.com.pfx'
-
-    Export-PfxCertificate `
-        -Password $password `
-        -FilePath $filePath `
-        -Cert $enrollmentResult.Certificate
-
-On VN1-SRV4, leave everything open for the next task.
-
-### Task 4: Install Windows Admin Center with high availability
-
-Perform this task on VN1-SRV4.
-
-1. Unblock the installation script, so that it can be executed without changing the execution policy.
-
-    *Important*: Replace **x** with the volume with 10 GB capacity, e.g., 1.
-
-    ````powershell
-    # Replace x with the volume with 10 GB capacity, e.g., 1
-    Unblock-File C:\ClusterStorage\Volumex\Install-WindowsAdminCenterHA.ps1
-    ````
-
-1. Install Windows Admin Center with high availability using the CSV with 10 GB capacity and the static address 10.1.1.34.
-
-    If you receive an error message running the script, restart VN1-SRV4 and try again.
-
-    ````powershell
-    $staticAddress = '10.1.1.34'
-    # Replace x with the volume with 10 GB capacity, e.g., 1
-    C:\ClusterStorage\Volumex\Install-WindowsAdminCenterHA.ps1 `
-        -clusterStorage C:\ClusterStorage\Volume1\ `
-        -clientAccessPoint $hostName `
-        -staticAddress 10.1.1.34 `
-        -msiPath C:\LabResources\WindowsAdminCenter.msi `
-        -certPath $filePath `
-        -certPassword $password
-    ````
-
-    This will take about 10 minutes.
-
-1. Add a DNS host record for the admincenter to the DNS server **VN1-SRV1**.
-
-    ````powershell
-    Add-DnsServerResourceRecordA `
-        -Name $hostname `
-        -IPv4Address $staticAddress `
-        -ComputerName VN1-SRV1 `
-        -ZoneName $zoneName
-    ````
-
-### Task 5: Verify Windows Admin Center installation
-
-Perform this task on CL1.
-
-1. Open **Failover Cluster Manager**.
-1. In Failover Cluster Manager, expand **VN1-CLST1.ad.adatum.com** and click **Roles**.
-
-    > The role admincenter should have been added.
-
-1. In Roles, click **admincenter**.
-1. In the bottom pane, click the tab **Resources**.
-1. On tab Resources, expand **Name: admincenter**
-
-    > Windows Admin center uses a network name and an IP address as additonal resources.
-
-1. Double click **IP Address: 10.1.1.34**.
-1. In IP Address: 10.1.1.34 Properties, review the options and click **Cancel**.
-1. Open **Microsoft Edge**.
-1. In Microsoft Edge, navigate to <https://admincenter>.
-
-    > Admin Center should load.
-
-## Exercise 5: Install File Server on a failover cluster
+## Exercise 4: Install File Server on a failover cluster
 
 1. [Install the File Server](#task-1-install-the-file-server-role) role on VN1-SRV4
 
@@ -827,23 +666,17 @@ Perform this task on CL1.
 1. On page Confirmation, click **Next >**.
 1. On page Summary, click **Finish**.
 
-## Exercise 6: Test failover
+## Exercise 5: Test failover
 
 1. [Monitor cluster services](#task-1-monitor-cluster-services) by testing the network connection to 10.1.1.184 continously, monitoring the console of VN1-SRV23 and viewing the Windows Admin Center web site
 
 1. [Simulate a failure](#task-2-simulate-a-failure) by turning off the node running the roles
-
-    > What happens to the Windows Admin Center?
 
     > What happens to the virtual machine?
 
 ### Task 1: Monitor cluster services
 
 Perform this task on CL1.
-
-1. Open Microsoft Edge and navigate to <https://admincenter>.
-
-    > Windows Admin Center should load.
 
 1. Open **Terminal**.
 1. In Terminal, test the connection to 10.1.1.184 or a long period.
@@ -861,8 +694,8 @@ Perform this task on CL1.
     1. In the following dialog, select the other node and click **OK**.
 
 1. In Roles, in the context-menu of **VN1-SRV23**, click **Connect...**.
-1. In VN1-SRV23 on VN1-SRV4 - Virtual Machine Connection, open an application, e.g. Editor.
-1. Arrange the window of **VN1-SRV23 on VN1-SRV4 - Virtual Machine Connection** so, that you can monitor it, while continuing with the next steps.
+1. In the VN1-SRV23 Virtual Machine Connection window, open an application, e.g. Editor.
+1. Arrange the window of **VN1-SRV23 Virtual Machine Connection** so, that you can monitor it, while continuing with the next steps.
 
 Keep all windows open for the next task.
 
@@ -880,7 +713,7 @@ Perform this task on the host.
 
 1. In the context-menu of the virtual computer you just turned off, click **Start**.
 
-## Exercise 7: Use cluster-aware updating
+## Exercise 6: Use cluster-aware updating
 
 ### Task 1: Configure cluster-aware updating
 
